@@ -19,7 +19,6 @@ import (
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 
-	"github.com/pressly/goose/v3"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/contrib/propagators/autoprop"
 	"go.opentelemetry.io/otel"
@@ -40,7 +39,6 @@ var (
 )
 
 func main() {
-
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -79,14 +77,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed init postgre: %v", err)
 	}
-
-	if err := goose.SetDialect("postgres"); err != nil {
-		log.Fatalf("failed to set goose dialect: %v", err)
-	}
-	if err := goose.Up(db.DB, "./pkg/migrations"); err != nil {
-		log.Fatalf("failed to run migrations: %v", err)
-	}
-	log.Println("Database migrated successfully")
 
 	routes.InitRoutes(e, db, tracer, logger)
 
