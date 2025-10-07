@@ -22,6 +22,13 @@ type Env struct {
 	PostgreMaxIddleCon   int
 	PostgreMaxLifeTime   int
 	PostgreDefaultSchema string
+	AppName              string
+	AppVersion           string
+	IsProduction         bool
+	OtelTraceHost        string
+	OtelTracePort        int
+	OtelMetricsHost      string
+	OtelMetricsPort      int
 }
 
 func init() {
@@ -88,5 +95,49 @@ func init() {
 	GlobalEnv.PostgreDefaultSchema, ok = os.LookupEnv("POSTGRE_DEFAULT_SCHEMA")
 	if !ok {
 		GlobalEnv.PostgreDefaultSchema = ""
+	}
+
+	GlobalEnv.AppName, ok = os.LookupEnv("APP_NAME")
+	if !ok {
+		log.Panicln("config.init() missing APP_NAME environment")
+	}
+
+	GlobalEnv.AppVersion, ok = os.LookupEnv("APP_VERSION")
+	if !ok {
+		log.Panicln("config.init() missing APP_VERSION environment")
+	}
+
+	isProductionStr, ok := os.LookupEnv("IS_PRODUCTION")
+	if !ok {
+		panic("missing IS_PRODUCTION environment")
+	}
+
+	isProduction, err := strconv.ParseBool(isProductionStr)
+	if err != nil {
+		panic("invalid value for IS_PRODUCTION, must be true or false")
+	}
+
+	GlobalEnv.IsProduction = isProduction
+
+	GlobalEnv.OtelTraceHost, ok = os.LookupEnv("OTEL_TRACE_HOST")
+	if !ok {
+		log.Panicln("config.init() missing OTEL_TRACE_HOST environment")
+	}
+
+	if port, err := strconv.Atoi(os.Getenv("OTEL_TRACE_PORT")); err != nil {
+		panic("missing OTEL_TRACE_PORT environment")
+	} else {
+		GlobalEnv.OtelTracePort = port
+	}
+
+	GlobalEnv.OtelMetricsHost, ok = os.LookupEnv("OTEL_METRICS_HOST")
+	if !ok {
+		log.Panicln("config.init() missing OTEL_METRICS_HOST environment")
+	}
+
+	if port, err := strconv.Atoi(os.Getenv("OTEL_METRICS_PORT")); err != nil {
+		panic("missing OTEL_METRICS_PORT environment")
+	} else {
+		GlobalEnv.OtelMetricsPort = port
 	}
 }

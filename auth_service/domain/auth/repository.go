@@ -25,9 +25,12 @@ func NewRepository(db *sqlx.DB, schema string) Repository {
 }
 
 func (r *repository) Insert(user *model.User) error {
-	query := fmt.Sprintf(`INSERT INTO %s.users (email, password) VALUES ($1, $2)`, r.schema)
+	queryPrep, err := r.db.Prepare(fmt.Sprintf(`INSERTt INTO %s.users (email, password) VALUES ($1, $2)`, r.schema))
+	if err != nil {
+		return err
+	}
 
-	_, err := r.db.Exec(query, user.Email, user.Password)
+	_, err = queryPrep.Exec(user.Email, user.Password)
 
 	if err != nil {
 		return err
