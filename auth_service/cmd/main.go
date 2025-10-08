@@ -14,6 +14,7 @@ import (
 	"github.com/helyus1412/auth-service/pkg/databases"
 	"github.com/helyus1412/auth-service/pkg/logger"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
@@ -62,6 +63,12 @@ func main() {
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(otelecho.Middleware(serviceName))
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"}, // Allow all origins
+		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.PATCH, echo.OPTIONS},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	// Initialize our custom Logger
 	logger, err := logger.New(logger.Config{

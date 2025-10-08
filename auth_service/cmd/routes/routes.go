@@ -20,4 +20,8 @@ func InitRoutes(e *echo.Echo, db *sqlx.DB, tc trace.Tracer, logger *logger.Logge
 	authHandler := auth.NewHandler(authUsecase, tc)
 
 	e.POST("/register", authHandler.Register)
+	e.POST("/login", authHandler.Login)
+	e.GET("/users", authHandler.ListUser)
+	e.PUT("/users/:id", authHandler.Edit)
+	e.DELETE("/users/:id", authHandler.Delete)
 }

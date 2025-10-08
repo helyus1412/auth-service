@@ -21,10 +21,13 @@ type BadRequest struct {
 }
 
 // NewBadRequest
-func NewBadRequest() BadRequest {
+func NewBadRequest(message string) BadRequest {
 	errObj := BadRequest{}
 	errObj.Message = "Bad Request"
 	errObj.Code = http.StatusBadRequest
+	if message != "" {
+		errObj.Message = message
+	}
 
 	return errObj
 }
